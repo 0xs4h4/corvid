@@ -71,6 +71,16 @@ def _parse_lsa_secret(secret: str) -> Optional[Credential]:
     return Credential(account=name.strip(), kind="password", value=value, source_host="")
 
 
+def _split_hashes(hashes: Optional[str]) -> tuple[str, str]:
+    """Split 'LMHASH:NTHASH' (or bare NTHASH) into (lmhash, nthash)."""
+    if not hashes:
+        return "", ""
+    parts = hashes.split(":")
+    if len(parts) >= 2:
+        return parts[0], parts[1]
+    return "", parts[0]
+
+
 class ActiveCollector:
     """Check local-admin access and dump SAM/LSA on target hosts."""
 
@@ -89,7 +99,8 @@ class ActiveCollector:
 
     def _connect(self, host: str) -> SMBConnection:
         conn = SMBConnection(host, host)
-        conn.login(self.username, self.password, self.domain, hashes=self.hashes)
+        lmhash, nthash = _split_hashes(self.hashes)
+        conn.login(self.username, self.password, self.domain, lmhash=lmhash, nthash=nthash)
         return conn
 
     def check_admin(self, host: str) -> bool:

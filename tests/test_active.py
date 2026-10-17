@@ -6,8 +6,16 @@ from adscan.collectors.active_collector import (
     Credential,
     _parse_lsa_secret,
     _parse_sam_line,
+    _split_hashes,
 )
 from adscan.graph.engine import build_graph
+
+
+def test_split_hashes():
+    assert _split_hashes(None) == ("", "")
+    assert _split_hashes("aad3b435b51404eeaad3b435b51404ee:36d55e1c7f5c9fc78f30e40de3b96708") == (
+        "aad3b435b51404eeaad3b435b51404ee", "36d55e1c7f5c9fc78f30e40de3b96708")
+    assert _split_hashes("36d55e1c7f5c9fc78f30e40de3b96708") == ("", "36d55e1c7f5c9fc78f30e40de3b96708")
 
 
 def test_parse_sam_line():
