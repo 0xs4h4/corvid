@@ -44,3 +44,29 @@ def test_no_controls_when_not_sddl():
     coll._search("DC=corp,DC=local", "(objectClass=user)", ["sAMAccountName"], sddl=False)
 
     assert conn.search.call_args.kwargs["controls"] is None
+
+
+def test_rbcd_none_returns_empty():
+    coll = _collector()
+    assert coll._rbcd({}) == ""
+    assert coll._rbcd({"msDS-AllowedToActOnBehalfOfOtherIdentity": None}) == ""
+
+
+def test_rbcd_empty_sd_list_returns_empty():
+    """ldap3 returns the attribute as [bytes]; an empty SD must not trip RBCD."""
+    coll = _collector()
+    sd = bytearray(20)
+    sd[16:20] = (0).to_bytes(4, "little")  # no DACL
+    e = {"msDS-AllowedToActOnBehalfOfOtherIdentity": [bytes(sd)]}
+    assert coll._rbcd(e) == ""
+
+
+def test_rbcd_real_sd_list_returns_hex():
+    coll = _collector()
+    sd = bytearray(26)
+    sd[16:20] = (20).to_bytes(4, "little")  # DACL offset
+    sd[20] = 2
+    sd[22:24] = (8).to_bytes(2, "little")   # AclSize
+    sd[24:26] = (1).to_bytes(2, "little")   # AceCount = 1
+    e = {"msDS-AllowedToActOnBehalfOfOtherIdentity": [bytes(sd)]}
+    assert coll._rbcd(e) == bytes(sd).hex()

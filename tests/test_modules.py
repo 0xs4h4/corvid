@@ -22,6 +22,12 @@ def test_kerberoast_detection():
     assert any("SPN" in t and "svc_sql" in t for t in _titles(fs))
 
 
+def test_kerberoast_excludes_krbtgt():
+    """krbtgt carries a kadmin/changepw SPN but must not be reported as kerberoastable."""
+    fs = _findings(["domain_recon"])
+    assert not any("krbtgt" in t and "SPN" in t for t in _titles(fs))
+
+
 def test_asrep_detection():
     fs = _findings(["credentials"])
     assert any("AS-REP" in t and "asrep_user" in t for t in _titles(fs))

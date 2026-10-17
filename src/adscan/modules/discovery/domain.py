@@ -86,24 +86,36 @@ class DomainReconModule(Module):
     def _spns(self, ctx: ScanContext) -> None:
         data = ctx.data
         for dn, u in data.users.items():
-            if u.servicePrincipalName:
-                self._finding(
-                    f"User '{u.sAMAccountName or u.name}' has SPN(s) (Kerberoastable)",
-                    Severity.MEDIUM, Confidence.HIGH, ctx,
-                    affected_principal=u.sAMAccountName or u.name,
-                    affected_object=dn,
-                    evidence={"spns": u.servicePrincipalName},
-                    impact="A service ticket for the SPN can be requested and brute-forced offline if the account password is weak.",
-                    prerequisites=["Domain user access to request a TGS."],
-                    manual_verification=["impacket-GetUserSPNs -request -dc-ip <DC> <domain>/<user>"],
-                    remediation=["Use long random passwords for service accounts (or gMSA).",
-                                 "Move services to group Managed Service Accounts."],
-                    mitre_attack=["T1558.003"],
-                )
+            if not u.servicePrincipalName:
+                continue
+            if self._rid(u.objectSid) == 502:
+                continue  # krbtgt carries a kadmin/changepw SPN but is not kerberoastable
+            self._finding(
+                f"User '{u.sAMAccountName or u.name}' has SPN(s) (Kerberoastable)",
+                Severity.MEDIUM, Confidence.HIGH, ctx,
+                affected_principal=u.sAMAccountName or u.name,
+                affected_object=dn,
+                evidence={"spns": u.servicePrincipalName},
+                impact="A service ticket for the SPN can be requested and brute-forced offline if the account password is weak.",
+                prerequisites=["Domain user access to request a TGS."],
+                manual_verification=["impacket-GetUserSPNs -request -dc-ip <DC> <domain>/<user>"],
+                remediation=["Use long random passwords for service accounts (or gMSA).",
+                             "Move services to group Managed Service Accounts."],
+                mitre_attack=["T1558.003"],
+            )
         for dn, c in data.computers.items():
             if c.servicePrincipalName:
                 # computer SPNs are normal (HOST/, etc.) — only flag user SPNs above
                 pass
+
+    @staticmethod
+    def _rid(sid: str | None) -> int | None:
+        if not sid:
+            return None
+        parts = sid.split("-")
+        if parts and parts[-1].isdigit():
+            return int(parts[-1])
+        return None
 
     def _stale_accounts(self, ctx: ScanContext) -> None:
         data = ctx.data

@@ -211,6 +211,10 @@ class LDAPCollector:
         v = e.get("msDS-AllowedToActOnBehalfOfOtherIdentity")
         if v is None:
             return ""
+        if isinstance(v, (list, tuple)):
+            if not v:
+                return ""
+            v = v[0]
         if isinstance(v, bytes):
             return v.hex() if sd_has_entries(v) else ""
         return str(v)

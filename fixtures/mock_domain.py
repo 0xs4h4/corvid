@@ -106,7 +106,7 @@ def build_mock_domain() -> ADData:
 
     # Administrator (RID 500), krbtgt (502)
     add_user(500, "Administrator")
-    add_user(502, "krbtgt")
+    add_user(502, "krbtgt", spns=["kadmin/changepw"])
     # Domain Admins (512), Domain Users (513), DnsAdmins (1101)
     da_dn, _ = add_group(512, "Domain Admins", members=[_dn("Administrator")])
     du_dn, du = add_group(513, "Domain Users")
