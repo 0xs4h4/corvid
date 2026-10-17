@@ -53,7 +53,7 @@ def render_dashboard(ctx: ScanContext, graph: Optional[Any] = None,
         summary.add_row(f"[{SEV_STYLES[sev]}]{sev}[/{SEV_STYLES[sev]}]", str(dist[sev]))
     console.print(summary)
 
-    if paths:
+    if paths is not None:
         console.print("\n[bold]Attack Paths to High-Value Targets[/bold]")
         if not paths:
             console.print("  [dim]none found[/dim]")
