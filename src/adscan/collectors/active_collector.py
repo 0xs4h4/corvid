@@ -23,7 +23,7 @@ log = logging.getLogger("adscan.active")
 
 try:
     from impacket.dcerpc.v5.rpcrt import DCERPCException
-    from impacket.examples.secretsdump import LSASecrets, RemoteFile, RemoteOperations, SAMHashes
+    from impacket.examples.secretsdump import LSASecrets, RemoteOperations, SAMHashes
     from impacket.smbconnection import SMBConnection, SessionError
 
     HAS_IMPACKET = True
@@ -143,22 +143,15 @@ class ActiveCollector:
         remote_ops.enableRegistry()
         boot_key = remote_ops.getBootKey()
         try:
-            sam_file = RemoteFile(conn, "SAM")
-            try:
-                sam = SAMHashes(sam_file, boot_key, isRemote=True, perSecretCallback=sam_cb)
-                sam.dump()
-                sam.finish()
-            finally:
-                sam_file.close()
+            sam = SAMHashes(remote_ops.saveSAM(), boot_key, isRemote=True,
+                            perSecretCallback=sam_cb)
+            sam.dump()
+            sam.finish()
 
-            sec_file = RemoteFile(conn, "SECURITY")
-            try:
-                lsa = LSASecrets(sec_file, boot_key, remoteOps=remote_ops, isRemote=True,
-                                 perSecretCallback=lsa_cb)
-                lsa.dump()
-                lsa.finish()
-            finally:
-                sec_file.close()
+            lsa = LSASecrets(remote_ops.saveSECURITY(), boot_key, remoteOps=remote_ops,
+                             isRemote=True, perSecretCallback=lsa_cb)
+            lsa.dump()
+            lsa.finish()
         finally:
             remote_ops.finish()
             try:
