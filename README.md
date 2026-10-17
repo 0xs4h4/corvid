@@ -17,8 +17,13 @@ purple-team exercises).
 - **11 detection modules** across domain recon, credential exposure, ACL
   abuse, GPO, Kerberos/delegation, AD CS (ESC1–ESC8), privilege escalation,
   network, infrastructure, vulnerabilities and persistence.
-- **Attack-path graph engine** (NetworkX): correlates `Principal → Group →
-  Permission → Object → High-Value Target`.
+- **Attack-path graph engine** (NetworkX, BloodHound-style): builds a directed
+  graph of *compromise* edges and finds shortest escalation paths to Domain
+  Admin from any starting principal. Edge types: `MemberOf`, `GenericAll`,
+  `GenericWrite`, `WriteDacl`, `WriteOwner`, `ForceChangePassword`, `DCSync`,
+  `AddSelf`, `Owns`, `Kerberoastable`, `ASREPRoastable`,
+  `ConstrainedDelegation`, `RBCD`, `UnconstrainedDelegation` — each annotated
+  with a MITRE technique and exploitation hint.
 - **Finding validation model** with severity + confidence scoring, evidence,
   prerequisites, manual verification, remediation, references and MITRE ATT&CK.
 - **Reporting**: interactive HTML, JSON, CSV, Rich terminal dashboard, graph
@@ -76,6 +81,33 @@ adscan checks --list
 adscan doctor
 ```
 
+### Find attack paths to Domain Admin
+
+The graph engine finds escalation paths from a starting principal (or every
+low-privileged user by default) to high-value targets.
+
+```bash
+# All low-privileged users as possible starts (default)
+adscan scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --mode full
+
+# Start from a specific compromised principal
+adscan scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --start svc_sql
+
+# Offline, from a prior snapshot
+adscan analyze -i reports/snapshot.json --start Eric.Wallows
+```
+
+`--start` accepts a `sAMAccountName`, DN or SID. Example output:
+
+```
+Attack Paths to High-Value Targets
+  svc_dcsync —DCSync (T1003.006) → Domain (DCSync)
+  michael —GenericAll (T1484) → Domain Admins
+```
+
+See [docs/attack-paths.md](docs/attack-paths.md) for the full edge taxonomy and
+caveats.
+
 ### Credentials
 
 The password is requested interactively (getpass), or read from the
@@ -105,10 +137,11 @@ pip install pytest
 pytest -q
 ```
 
-The test suite (41 tests) covers SDDL parsing, SID resolution, ACL analysis,
-delegation flags, Kerberos eligibility, AD CS templates, graph correlation,
-report generation, serialization round-trips and error handling (failed
-authentication, DNS failure, collection failure, insufficient data).
+The test suite (53 tests) covers SDDL parsing, SID resolution, ACL analysis,
+delegation flags, Kerberos eligibility, AD CS templates, graph correlation and
+attack-path finding, report generation, serialization round-trips and error
+handling (failed authentication, DNS failure, collection failure, insufficient
+data).
 
 ## Authorization
 
