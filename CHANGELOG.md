@@ -2,6 +2,23 @@
 
 All notable changes to adscan are documented here.
 
+## [1.2.1] — 2026-10-18
+
+Active-layer bugfixes (impacket 0.13 compatibility + safer hive dumps).
+
+- **DPAPI keys filtered from LSA printable secrets**: `dpapi_machinekey` /
+  `dpapi_userkey` are hex key material, not credentials — skipped in parsing.
+- **`LSASecrets.dump()` → `dumpSecrets()`**: impacket's `LSASecrets` exposes
+  `dumpSecrets()` (not `dump()`, unlike `SAMHashes`); each dump is wrapped in
+  try/finally so the hive `RemoteFile` is always closed.
+- **Registry export via `remoteOps.saveSAM()` / `saveSECURITY()`**: hives are not
+  at `ADMIN$\SAM` — `RemoteOperations` exports them over WinReg RPC (fixes
+  `STATUS_OBJECT_NAME_NOT_FOUND`).
+- **`SMBConnection.login()` args**: impacket 0.13 takes `lmhash`/`nthash`, not a
+  combined `hashes` kwarg — split `LM:NTH` in `_connect()`.
+
+62 tests pass.
+
 ## [1.2.0] — 2026-10-18
 
 Active layer (local attack surface) — the missing half of the attack graph.

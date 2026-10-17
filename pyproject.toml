@@ -1,6 +1,6 @@
 [project]
 name = "adscan"
-version = "1.2.0"
+version = "1.2.1"
 description = "Active Directory attack-surface and exploitability scanner (read-only assessment)"
 readme = "README.md"
 requires-python = ">=3.11"
