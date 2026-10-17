@@ -58,6 +58,7 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--no-password", action="store_true", help="No password (anonymous / env-provided).")
     sp.add_argument("--config", help="Path to YAML config file.")
     sp.add_argument("--no-dashboard", action="store_true", help="Skip the Rich terminal dashboard.")
+    sp.add_argument("--start", help="Principal to start attack-path search from (sAMAccountName/DN/SID).")
     sp.set_defaults(func=cmd_scan)
 
     # --- analyze ---
@@ -66,6 +67,7 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--mode", choices=["quick", "full"], default="full")
     ap.add_argument("--modules", help="Comma-separated module names (optional).")
     ap.add_argument("--output", "-o", default="reports", help="Output directory.")
+    ap.add_argument("--start", help="Principal to start attack-path search from (sAMAccountName/DN/SID).")
     ap.set_defaults(func=cmd_analyze)
 
     # --- report ---
@@ -133,7 +135,7 @@ def cmd_scan(args: argparse.Namespace) -> int:
     ctx.deduplicate()
 
     graph = build_graph(ctx)
-    paths = graph.find_paths()
+    paths = graph.find_paths(start=getattr(args, "start", None))
 
     out = Path(opts.output_dir)
     json_report.write_json(ctx, out, graph, paths)
@@ -170,7 +172,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     ctx.deduplicate()
 
     graph = build_graph(ctx)
-    paths = graph.find_paths()
+    paths = graph.find_paths(start=getattr(args, "start", None))
 
     out = Path(args.output)
     json_report.write_json(ctx, out, graph, paths)

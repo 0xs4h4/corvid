@@ -55,9 +55,12 @@ def render_dashboard(ctx: ScanContext, graph: Optional[Any] = None,
 
     if paths:
         console.print("\n[bold]Attack Paths to High-Value Targets[/bold]")
+        if not paths:
+            console.print("  [dim]none found[/dim]")
         for p in paths:
             chain = " → ".join(
-                f"[cyan]{h['from']}[/cyan] [yellow]—{h['edge']}→[/yellow]"
+                f"[cyan]{h['from']}[/cyan] [yellow]—{h['edge']}[/yellow]"
+                + (f" [dim]({h.get('technique') or ''})[/dim]" if h.get("technique") else "")
                 for h in p["hops"]
             ) + f" → [bold red]{p['target']}[/bold red]"
             console.print(f"  {chain}")

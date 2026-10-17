@@ -2,6 +2,20 @@
 
 All notable changes to adscan are documented here.
 
+## [1.1.0] — 2026-10-18
+
+BloodHound-style attack-path engine.
+
+- **Comprehensive attack graph** with compromise edges: `MemberOf`, `GenericAll`,
+  `GenericWrite`, `WriteDacl`, `WriteOwner`, `ForceChangePassword`, `DCSync`,
+  `AddSelf`, `Owns`, `Kerberoastable`, `ASREPRoastable`,
+  `ConstrainedDelegation`, `RBCD`, `UnconstrainedDelegation`.
+- **Pathfinding** (`find_paths`) with a `--start` flag (sAMAccountName/DN/SID),
+  ranked by hop count then technique diversity; MITRE technique + exploitation
+  hint on every hop.
+- Expanded high-value targets (Domain Controllers group + DC computers + krbtgt).
+- New doc: `docs/attack-paths.md`.
+
 ## [1.0.0] — 2026-10-18
 
 First stable release. Live-validated against a real Active Directory lab (SECURA).
