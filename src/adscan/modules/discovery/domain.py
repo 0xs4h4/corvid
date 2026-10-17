@@ -20,17 +20,24 @@ UF_DONT_REQUIRE_PREAUTH = 0x400000
 
 # Privileged / interesting group RIDs (by well-known RID within domain)
 PRIV_GROUP_RIDS = {
+    498: "Enterprise Read-Only Domain Controllers",
     512: "Domain Admins",
+    516: "Domain Controllers",
     518: "Schema Admins",
     519: "Enterprise Admins",
-    516: "Domain Controllers",
-    498: "Enterprise Read-Only Domain Controllers",
+    520: "Group Policy Creator Owners",
+    521: "Read-only Domain Controllers",
+    526: "Key Admins",
+    527: "Enterprise Key Admins",
+    544: "Administrators",
     548: "Account Operators",
     549: "Server Operators",
     550: "Print Operators",
     551: "Backup Operators",
     552: "Replicator",
-    544: "Administrators",
+    553: "RAS and IAS Servers",
+    571: "Allowed RODC Password Replication Group",
+    572: "Denied RODC Password Replication Group",
     1101: "DnsAdmins",
 }
 
