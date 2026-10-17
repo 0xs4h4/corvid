@@ -201,7 +201,9 @@ class LDAPCollector:
 
     def _str(self, e: dict, key: str) -> str:
         v = e.get(key)
-        if isinstance(v, (list, tuple)) and v:
+        if isinstance(v, (list, tuple)):
+            if not v:
+                return ""
             v = v[0]
         return str(v) if v is not None else ""
 
