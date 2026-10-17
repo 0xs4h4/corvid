@@ -18,27 +18,31 @@ UF_TRUSTED_FOR_DELEGATION = 0x80000
 UF_NOT_DELEGATED = 0x100000
 UF_DONT_REQUIRE_PREAUTH = 0x400000
 
-# Privileged / interesting group RIDs (by well-known RID within domain)
+# High-value groups whose membership is worth reporting in the attack-path graph
 PRIV_GROUP_RIDS = {
-    498: "Enterprise Read-Only Domain Controllers",
     512: "Domain Admins",
     516: "Domain Controllers",
     518: "Schema Admins",
     519: "Enterprise Admins",
-    520: "Group Policy Creator Owners",
-    521: "Read-only Domain Controllers",
-    526: "Key Admins",
-    527: "Enterprise Key Admins",
     544: "Administrators",
     548: "Account Operators",
     549: "Server Operators",
     550: "Print Operators",
     551: "Backup Operators",
     552: "Replicator",
+    1101: "DnsAdmins",
+}
+
+# Well-known protected groups (adminCount=1 is normal for these — suppress noise)
+PROTECTED_GROUP_RIDS = PRIV_GROUP_RIDS | {
+    498: "Enterprise Read-Only Domain Controllers",
+    520: "Group Policy Creator Owners",
+    521: "Read-only Domain Controllers",
+    526: "Key Admins",
+    527: "Enterprise Key Admins",
     553: "RAS and IAS Servers",
     571: "Allowed RODC Password Replication Group",
     572: "Denied RODC Password Replication Group",
-    1101: "DnsAdmins",
 }
 
 
@@ -79,7 +83,7 @@ class DomainReconModule(Module):
                                  "Remove non-essential accounts from privileged groups."],
                     mitre_attack=["T1078"],
                 )
-            if g.adminCount and rid not in PRIV_GROUP_RIDS:
+            if g.adminCount and rid not in PROTECTED_GROUP_RIDS:
                 self._finding(
                     f"adminCount=1 group '{g.name}' (unexpectedly protected)",
                     Severity.LOW, Confidence.HIGH, ctx,
