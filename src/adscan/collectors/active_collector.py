@@ -145,13 +145,17 @@ class ActiveCollector:
         try:
             sam = SAMHashes(remote_ops.saveSAM(), boot_key, isRemote=True,
                             perSecretCallback=sam_cb)
-            sam.dump()
-            sam.finish()
+            try:
+                sam.dump()
+            finally:
+                sam.finish()
 
             lsa = LSASecrets(remote_ops.saveSECURITY(), boot_key, remoteOps=remote_ops,
                              isRemote=True, perSecretCallback=lsa_cb)
-            lsa.dump()
-            lsa.finish()
+            try:
+                lsa.dumpSecrets()
+            finally:
+                lsa.finish()
         finally:
             remote_ops.finish()
             try:
