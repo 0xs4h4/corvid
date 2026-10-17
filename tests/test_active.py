@@ -49,6 +49,11 @@ def test_parse_lsa_secret_hash_skipped():
     ) is None
 
 
+def test_parse_lsa_secret_dpapi_skipped():
+    assert _parse_lsa_secret("dpapi_machinekey:0x9aacf2053358fe54153ab16c4ee50b08efc72f48") is None
+    assert _parse_lsa_secret("dpapi_userkey:0xe2328bc9bb89ee0c21b62f86a6f6b438ad9c54cd") is None
+
+
 def test_add_active_admin_to_edges():
     ctx = build_mock_context()
     g = build_graph(ctx)

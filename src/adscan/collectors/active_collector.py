@@ -65,8 +65,11 @@ def _parse_lsa_secret(secret: str) -> Optional[Credential]:
     value = value.strip()
     if not value:
         return None
-    # skip machine-account kerberos/hash material
-    if value.startswith(("aes256-", "aes128-", "des-cbc", "plain_password_hex", "aad3b435")):
+    # skip DPAPI key material and other non-credential LSA secrets
+    if name.lower().startswith(("dpapi", "nl$", "$machine")):
+        return None
+    # skip hex key material and machine-account kerberos/hash material
+    if value.startswith(("0x", "aes256-", "aes128-", "des-cbc", "plain_password_hex", "aad3b435")):
         return None
     return Credential(account=name.strip(), kind="password", value=value, source_host="")
 
