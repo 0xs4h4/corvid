@@ -59,6 +59,8 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--config", help="Path to YAML config file.")
     sp.add_argument("--no-dashboard", action="store_true", help="Skip the Rich terminal dashboard.")
     sp.add_argument("--start", help="Principal to start attack-path search from (sAMAccountName/DN/SID).")
+    sp.add_argument("--active", action="store_true", help="Active layer: check local-admin + dump SAM/LSA on --hosts.")
+    sp.add_argument("--hosts", help="Comma-separated target hosts (IPs/hostnames) for --active.")
     sp.set_defaults(func=cmd_scan)
 
     # --- analyze ---
@@ -93,6 +95,29 @@ def _selected_modules(args: argparse.Namespace) -> list[str]:
     if args.modules:
         return [m.strip() for m in args.modules.split(",") if m.strip()]
     return []
+
+
+def _graph_principal(username: str) -> str:
+    """Normalize 'DOMAIN\\user' / 'user@domain' to the bare sAMAccountName."""
+    u = username.replace("\\", "/").split("/")[-1]
+    return u.split("@")[0]
+
+
+def _run_active(args: argparse.Namespace, opts, password: str, graph):
+    """Run the active layer (admin check + SAM/LSA dump) and fold it into the graph."""
+    if not args.hosts:
+        print("[-] --active requires --hosts (comma-separated IPs/hostnames).", file=sys.stderr)
+        return None
+    from .collectors.active_collector import ActiveCollector
+
+    hosts = [h.strip() for h in args.hosts.split(",") if h.strip()]
+    collector = ActiveCollector(
+        username=opts.username, password=password, domain=opts.domain, hashes=opts.hashes
+    )
+    print(f"\n[*] Active layer: checking admin access on {len(hosts)} host(s)...")
+    result = collector.run(hosts)
+    graph.add_active(result, _graph_principal(opts.username))
+    return result
 
 
 def cmd_scan(args: argparse.Namespace) -> int:
@@ -135,15 +160,23 @@ def cmd_scan(args: argparse.Namespace) -> int:
     ctx.deduplicate()
 
     graph = build_graph(ctx)
-    paths = graph.find_paths(start=getattr(args, "start", None))
+
+    active_result = None
+    if args.active:
+        active_result = _run_active(args, opts, password, graph)
+        if active_result is None:
+            return 1
+        paths = graph.find_paths(start=_graph_principal(opts.username))
+    else:
+        paths = graph.find_paths(start=getattr(args, "start", None))
 
     out = Path(opts.output_dir)
-    json_report.write_json(ctx, out, graph, paths)
+    json_report.write_json(ctx, out, graph, paths, active_result)
     csv_report.write_csv(ctx, out)
     html_report.write_html(ctx, out, graph, paths)
     save_snapshot(data, out / "snapshot.json")
     if not args.no_dashboard:
-        rich_dashboard.render_dashboard(ctx, graph, paths)
+        rich_dashboard.render_dashboard(ctx, graph, paths, active_result)
 
     print(f"\n[+] Scan complete. {len(ctx.findings)} findings. Reports written to {out.resolve()}")
     return 0

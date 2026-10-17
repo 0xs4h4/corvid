@@ -2,6 +2,21 @@
 
 All notable changes to adscan are documented here.
 
+## [1.2.0] — 2026-10-18
+
+Active layer (local attack surface) — the missing half of the attack graph.
+
+- **`--active` / `--hosts`**: opt-in layer that, given credentials, checks which
+  hosts they are local admin on and dumps SAM hashes + printable LSA secrets
+  (service/account passwords) via impacket.
+- **Two new graph edges**: `AdminTo` (principal → host) and `CredentialReuse`
+  (host → domain account) when a dumped local account name matches a domain
+  account — turns the full local→domain path into a single `find_paths` chain.
+- **Password-reuse hints** surfaced in the dashboard, JSON report and graph.
+- New optional extra: `pip install adscan[active]` (pulls in `impacket`).
+- New collector: `collectors/active_collector.py` (SMB admin check via `C$`,
+  SAM/LSA dump via `RemoteOperations` + `SAMHashes` + `LSASecrets`).
+
 ## [1.1.0] — 2026-10-18
 
 BloodHound-style attack-path engine.

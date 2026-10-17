@@ -21,7 +21,7 @@ SEV_STYLES = {
 
 
 def render_dashboard(ctx: ScanContext, graph: Optional[Any] = None,
-                    paths: Optional[list] = None) -> None:
+                    paths: Optional[list] = None, active_result: Optional[Any] = None) -> None:
     console = Console()
     dist = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
     for f in ctx.findings:
@@ -64,6 +64,22 @@ def render_dashboard(ctx: ScanContext, graph: Optional[Any] = None,
                 for h in p["hops"]
             ) + f" → [bold red]{p['target']}[/bold red]"
             console.print(f"  {chain}")
+
+    if active_result is not None:
+        console.print("\n[bold]Active Layer (local admin + credentials)[/bold]")
+        if active_result.admin_hosts:
+            console.print("  [bold]AdminTo:[/bold] " + ", ".join(
+                f"[cyan]{h}[/cyan]" for h in active_result.admin_hosts))
+        else:
+            console.print("  [dim]no local-admin access found[/dim]")
+        for hint in active_result.reuse_hints:
+            console.print(
+                f"  [yellow][!] CredentialReuse[/yellow] local '{hint['local_account']}' "
+                f"({hint['secret_kind']}) → domain '{hint['domain_account']}' "
+                f"[dim]via {hint['source_host']}[/dim]")
+        if active_result.credentials:
+            creds = [f"{c.account}({c.kind})" for c in active_result.credentials]
+            console.print(f"  [dim]dumped {len(active_result.credentials)} creds: {', '.join(creds)}[/dim]")
 
     table = Table(title="Findings")
     table.add_column("Sev", justify="center")

@@ -47,6 +47,8 @@ EDGE_INFO: dict[str, tuple[str, str]] = {
     "RBCD": ("T1558.001", "control the allowed-to-act account -> impersonate on this host"),
     "UnconstrainedDelegation": ("T1558.001", "control this host -> capture TGTs (incl. DC)"),
     "GPOControl": ("T1484", "control the GPO -> push policy to linked computers"),
+    "AdminTo": ("T1078", "local admin on this host -> dump creds / run as admin"),
+    "CredentialReuse": ("T1078", "credentials dumped here likely reuse the domain account's password"),
 }
 
 # Resolved right fragment -> edge kind (order matters: first match wins per ACE)
@@ -210,6 +212,49 @@ class AttackPathGraph:
             return None
         host = spn.split("/", 1)[1].split(":")[0].lower()
         return self._host_index.get(host)
+
+    # -- active (layer 2) integration ---------------------------------------
+    @staticmethod
+    def _acct_key(name: str) -> str:
+        return (name or "").lower().rstrip("$")
+
+    def add_active(self, active_result, principal: str) -> None:
+        """Fold active collection (admin hosts + dumped creds) into the graph.
+
+        Adds ``AdminTo`` edges (principal -> host) and ``CredentialReuse`` edges
+        (host -> domain account) when a dumped local account name matches a
+        domain account name.
+        """
+        domain_names: dict[str, str] = {}
+        for dn, u in self.data.users.items():
+            domain_names[self._acct_key(u.sAMAccountName or u.name)] = dn
+
+        principal_dn = self._resolve_start(principal) or principal
+        self._node(principal_dn, self.data.principal_name(principal_dn), "principal")
+
+        for host in active_result.admin_hosts:
+            host_node = f"HOST:{host}"
+            self._node(host_node, host, "host")
+            self.g.add_edge(principal_dn, host_node, kind="AdminTo")
+
+        for cred in active_result.credentials:
+            key = self._acct_key(cred.account)
+            if key not in domain_names:
+                continue
+            target_dn = domain_names[key]
+            # find which host this credential came from
+            host_node = f"HOST:{cred.source_host}"
+            if host_node not in self.g:
+                self._node(host_node, cred.source_host, "host")
+            self.g.add_edge(host_node, target_dn, kind="CredentialReuse",
+                            credential=cred.value)
+            active_result.reuse_hints.append({
+                "local_account": cred.account,
+                "domain_account": self.data.principal_name(target_dn),
+                "secret_kind": cred.kind,
+                "secret_value": cred.value,
+                "source_host": cred.source_host,
+            })
 
     # -- pathfinding ---------------------------------------------------------
     def find_paths(self, start: Optional[str] = None, limit: int = 50, max_hops: int = 5) -> list[dict[str, Any]]:
