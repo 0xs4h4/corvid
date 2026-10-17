@@ -37,8 +37,8 @@ class VulnerabilityModule(Module):
             vulnerable_os = any(s in os_name for s in ("2008", "2012", "2016", "2019"))
             self._finding(
                 f"Potential Zerologon (CVE-2020-1472) exposure on DC '{c.name}' ({c.operatingSystem})",
-                Severity.CRITICAL if vulnerable_os else Severity.LOW,
-                Confidence.MEDIUM if vulnerable_os else Confidence.LOW,
+                Severity.HIGH if vulnerable_os else Severity.LOW,
+                Confidence.LOW if vulnerable_os else Confidence.LOW,
                 ctx,
                 affected_object=dn,
                 evidence={"os": c.operatingSystem, "dNSHostName": c.dNSHostName},

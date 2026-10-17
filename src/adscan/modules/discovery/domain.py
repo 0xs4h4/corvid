@@ -72,14 +72,14 @@ class DomainReconModule(Module):
                                  "Remove non-essential accounts from privileged groups."],
                     mitre_attack=["T1078"],
                 )
-            if g.adminCount:
+            if g.adminCount and rid not in PRIV_GROUP_RIDS:
                 self._finding(
-                    f"adminCount=1 group '{g.name}'",
+                    f"adminCount=1 group '{g.name}' (unexpectedly protected)",
                     Severity.LOW, Confidence.HIGH, ctx,
                     affected_object=dn,
                     evidence={"group": g.name, "adminCount": g.adminCount},
-                    impact="Group is marked as protected; ACL changes are subject to SDProp.",
-                    remediation=["Review protected groups for expected membership."],
+                    impact="Group is marked as protected (SDProp); unexpected protected groups may indicate a delegated admin or persistence.",
+                    remediation=["Review unexpected protected groups."],
                     mitre_attack=["T1078"],
                 )
 

@@ -8,6 +8,7 @@ from ...core.finding import Category, Confidence, Finding, Severity
 from ...core.sid import DANGEROUS_EXTENDED_RIGHTS
 from ..base import Module, register
 
+UF_ACCOUNTDISABLE = 0x0002
 UF_PASSWD_NOTREQD = 0x0020
 UF_ENCRYPTED_TEXT_PASSWORD_ALLOWED = 0x0080
 UF_DONT_EXPIRE_PASSWD = 0x10000
@@ -49,6 +50,8 @@ class CredentialExposureModule(Module):
         for dn, u in data.users.items():
             uac = u.userAccountControl
             name = u.sAMAccountName or u.name
+            if uac & UF_ACCOUNTDISABLE:
+                continue  # disabled accounts are not exploitable
             if uac & UF_PASSWD_NOTREQD:
                 self._finding(
                     f"Account '{name}' has 'password not required' set",

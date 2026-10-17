@@ -174,3 +174,20 @@ def acl_has_dangerous_right(acl: ACL, trustee_sid: Optional[str] = None) -> list
         if any("GenericAll" in r or "WriteDacl" in r or "WriteOwner" in r or "DCSync" in r or "ForceChangePassword" in r for r in ace.rights):
             out.append(ace)
     return out
+
+
+def sd_has_entries(sd: bytes) -> bool:
+    """Return True if a raw security descriptor has a DACL with >=1 ACE.
+
+    Used to tell a *set* ``msDS-AllowedToActOnBehalfOfOtherIdentity`` (RBCD)
+    apart from the empty/absent security descriptor that AD returns for
+    unconfigured objects (which otherwise stringifies as a false positive).
+    """
+    if not sd or len(sd) < 20:
+        return False
+    dacl_off = int.from_bytes(sd[16:20], "little")
+    if dacl_off == 0 or dacl_off + 6 > len(sd):
+        return False
+    # ACL header: AclRevision(1) Sbz1(1) AclSize(2) AceCount(2)
+    ace_count = int.from_bytes(sd[dacl_off + 4 : dacl_off + 6], "little")
+    return ace_count > 0

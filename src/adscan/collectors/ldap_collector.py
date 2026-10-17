@@ -30,7 +30,7 @@ from ..core.models import (
     DomainInfo,
 )
 from ..core.sid import sid_to_sddl
-from ..utils.acl_parser import parse_sddl
+from ..utils.acl_parser import parse_sddl, sd_has_entries
 
 log = get_logger("collector")
 
@@ -205,6 +205,16 @@ class LDAPCollector:
             v = v[0]
         return str(v) if v is not None else ""
 
+    def _rbcd(self, e: dict) -> str:
+        """Extract msDS-AllowedToActOnBehalfOfOtherIdentity, but return '' when
+        the security descriptor is empty/absent (avoids a false-positive RBCD)."""
+        v = e.get("msDS-AllowedToActOnBehalfOfOtherIdentity")
+        if v is None:
+            return ""
+        if isinstance(v, bytes):
+            return v.hex() if sd_has_entries(v) else ""
+        return str(v)
+
     # -- collection ---------------------------------------------------------
     def collect(self, ctx: ScanContext) -> ADData:
         data = ctx.data
@@ -313,7 +323,7 @@ class LDAPCollector:
                 servicePrincipalName=self._strlist(e, "servicePrincipalName"),
                 operatingSystem=self._str(e, "operatingSystem"),
                 userAccountControl=self._int(e, "userAccountControl"),
-                msds_AllowedToActOnBehalfOfOtherIdentity=self._str(e, "msDS-AllowedToActOnBehalfOfOtherIdentity"),
+                msds_AllowedToActOnBehalfOfOtherIdentity=self._rbcd(e),
                 msds_AllowedToDelegateTo=self._strlist(e, "msDS-AllowedToDelegateTo"),
                 dNSHostName=self._str(e, "dNSHostName"), acl=self._acl(e),
             )

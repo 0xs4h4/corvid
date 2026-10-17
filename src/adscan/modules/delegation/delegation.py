@@ -9,6 +9,7 @@ from ..base import Module, register
 
 UF_TRUSTED_FOR_DELEGATION = 0x80000
 UF_NOT_DELEGATED = 0x100000
+UF_SERVER_TRUST_ACCOUNT = 0x2000  # domain controller
 
 
 @register
@@ -28,6 +29,8 @@ class DelegationModule(Module):
     def _unconstrained(self, ctx: ScanContext) -> None:
         data = ctx.data
         for dn, c in data.computers.items():
+            if c.userAccountControl & UF_SERVER_TRUST_ACCOUNT:
+                continue  # domain controllers are always trusted for delegation
             if c.userAccountControl & UF_TRUSTED_FOR_DELEGATION:
                 self._finding(
                     f"Unconstrained delegation on computer '{c.name}'",
