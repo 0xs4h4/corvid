@@ -5,7 +5,7 @@ import sys
 import pytest
 
 from corvid_sweep import __version__
-from corvid_sweep.cli import main
+from corvid_sweep.cli import fix_output_ownership, give_back, main
 
 
 def test_help_exits_zero(monkeypatch, capsys):
@@ -32,3 +32,17 @@ def test_missing_targets_file_errors(monkeypatch, tmp_path, capsys):
     with pytest.raises(SystemExit) as exc:
         main()
     assert exc.value.code != 0
+
+
+def test_fix_output_ownership_noop_for_non_root(tmp_path):
+    report = tmp_path / "report.txt"
+    report.write_text("x")
+    fix_output_ownership(tmp_path)          # must not raise as a normal user
+    assert report.read_text() == "x"
+
+
+def test_give_back_noop_for_non_root(tmp_path):
+    out = tmp_path / "runs"
+    out.mkdir()
+    give_back(out)                          # must not raise without SUDO_UID
+    assert out.is_dir()

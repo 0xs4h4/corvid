@@ -412,6 +412,38 @@ def run_resumed_scans(records, folder, started, nmap, args):
     return failed, interrupted
 
 
+def fix_output_ownership(path):
+    """When run under sudo, hand the output files back to the calling user."""
+    if os.geteuid() != 0:
+        return
+    uid, gid = os.environ.get('SUDO_UID'), os.environ.get('SUDO_GID')
+    if not uid:
+        return
+    try:
+        uid, gid = int(uid), int(gid or uid)
+    except ValueError:
+        return
+    for current, dirs, files in os.walk(path):
+        for name in [current, *(os.path.join(current, f) for f in files)]:
+            try:
+                os.chown(name, uid, gid)
+            except OSError:
+                pass
+
+
+def give_back(path):
+    """Chown a single path (non-recursive) back to the sudo caller."""
+    if os.geteuid() != 0:
+        return
+    uid, gid = os.environ.get('SUDO_UID'), os.environ.get('SUDO_GID')
+    if not uid or not path.is_dir():
+        return
+    try:
+        os.chown(path, int(uid), int(gid or uid))
+    except (OSError, ValueError):
+        pass
+
+
 def main():
     run_started = time.monotonic()
     parser = argparse.ArgumentParser(description=__doc__)
@@ -471,6 +503,8 @@ def main():
     write_text_report(report_path, records, started, duration)
     print(f'Report save to : {report_path.resolve()}')
     print(f'Total Scan : {duration}')
+    fix_output_ownership(folder)
+    give_back(args.output)
     return 130 if interrupted else (1 if failed else 0)
 
 

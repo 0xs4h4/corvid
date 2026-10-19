@@ -54,6 +54,13 @@ corvid-sweep -i targets.txt -o runs/           # write results under runs/
 Each run creates a timestamped folder containing the nmap artefacts and a
 plain-text report.
 
+Run it with `sudo` and the output is handed back to you (`chown` to
+`SUDO_UID`), so you do not end up with root-owned reports you cannot delete.
+
+Need a SYN scan but `sudo` cannot find the command? `sudo` throws away your
+`PATH`. Use `sudo $(which corvid-sweep) -i targets.txt`, or symlink it once:
+`sudo ln -sf ~/.local/bin/corvid-sweep /usr/bin/corvid-sweep`.
+
 ## Requirements
 
 `nmap` on `PATH`. Python 3.11+.
