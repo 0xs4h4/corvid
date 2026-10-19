@@ -2,6 +2,13 @@
 
 All notable changes to corvid-ad are documented here.
 
+## [1.3.0] - 2026-10-19
+
+- Scan output now goes to `corvid-ad-output/corvid-ad-YYYYMMDD-N/` (was
+  `reports/`), matching the `corvid-sweep` layout. `-o` still overrides the
+  parent directory.
+- `analyze` and `report` keep writing straight into `-o`.
+
 ## [1.2.1] — 2026-10-18
 
 Active-layer bugfixes (impacket 0.13 compatibility + safer hive dumps).
