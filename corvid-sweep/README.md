@@ -1,26 +1,34 @@
 # corvid-sweep
 
-Two-pass TCP discovery across a list of targets, then service detection on the
-ports that answered, then a per-target text report.
+A port scanner for a list of hosts.
 
-The point of the two passes: see the whole attack surface before committing
-time to one host. Pass 1 is cheap discovery across everything; pass 2 spends
-`-sV` only where something is actually listening.
+It works in two passes. Pass one: which ports are open. Pass two: what service
+and version runs on those ports. At the end you get one text report.
+
+Why two passes? You see the whole picture first. Then you spend the slow
+version scan only on ports that answered.
 
 ## Install
 
-Public repo — no key or token needed.
+Two ways. Pick one.
+
+**Way 1 — you just want to use it**
 
 ```bash
-# from a clone (editable, for when you're editing)
-git clone https://github.com/0xs4h4/corvid.git
-pipx install --editable ./corvid/corvid-sweep
-
-# or straight from git, no clone
 pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-sweep"
-
 corvid-sweep --help
 ```
+
+**Way 2 — you want to change the code**
+
+```bash
+git clone https://github.com/0xs4h4/corvid.git
+pipx install --editable ./corvid/corvid-sweep
+```
+
+Updating: Way 1 → `pipx reinstall corvid-sweep`. Way 2 → `git pull`.
+
+No pipx? `sudo apt install pipx && pipx ensurepath`
 
 Or run it from a checkout without installing:
 

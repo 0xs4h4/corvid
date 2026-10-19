@@ -1,69 +1,63 @@
 # corvid-ad
 
-A **read-only** Active Directory attack-surface and exploitability scanner.
+A read-only scanner for Active Directory.
 
-corvid-ad performs authenticated LDAP reconnaissance and detects exploitable
-misconfigurations, dangerous permissions, privilege-escalation paths, lateral
-movement prerequisites and domain-compromise risks. It is designed for
-**explicitly authorized** assessments (internal pentests, OSCP-style labs,
-purple-team exercises).
+You give it a domain and one normal user account. It reads whatever that
+account is allowed to read, then tells you what is weak and how someone could
+move up from there to Domain Admin.
 
-> **Read-only by default.** corvid-ad never modifies AD objects, never dumps
-> secrets, never requests roasting tickets, never cracks passwords, and never
-> forges tickets or implements persistence.
+Use it only on systems you are allowed to test: internal pentests, OSCP-style
+labs, purple-team work.
 
-## Features
+> **It only reads.** It does not change AD objects, does not dump secrets,
+> does not ask for roastable tickets, does not crack passwords, and does not
+> forge tickets.
 
-- **11 detection modules** across domain recon, credential exposure, ACL
-  abuse, GPO, Kerberos/delegation, AD CS (ESC1–ESC8), privilege escalation,
-  network, infrastructure, vulnerabilities and persistence.
-- **Attack-path graph engine** (NetworkX, BloodHound-style): builds a directed
-  graph of *compromise* edges and finds shortest escalation paths to Domain
-  Admin from any starting principal. Edge types: `MemberOf`, `GenericAll`,
-  `GenericWrite`, `WriteDacl`, `WriteOwner`, `ForceChangePassword`, `DCSync`,
-  `AddSelf`, `Owns`, `Kerberoastable`, `ASREPRoastable`,
-  `ConstrainedDelegation`, `RBCD`, `UnconstrainedDelegation` — each annotated
-  with a MITRE technique and exploitation hint.
-- **Active layer (`--active`)**: opt-in local attack surface — checks which
-  hosts your credentials are local admin on (`AdminTo`) and dumps SAM hashes +
-  LSA service/account passwords (`impacket`), then folds `CredentialReuse`
-  edges into the graph so the *local → domain* hop is part of the same path.
-- **Finding validation model** with severity + confidence scoring, evidence,
-  prerequisites, manual verification, remediation, references and MITRE ATT&CK.
-- **Reporting**: interactive HTML, JSON, CSV, Rich terminal dashboard, graph
-  visualization data, and a snapshot for offline analysis.
-- **Modes**: `quick` (high-signal), `full` (all modules), `focused` (selected
-  modules), `offline` (analyze prior snapshots).
-- **Safe credential handling** (never logged or printed; pass-the-hash supported).
+## What it checks
+
+- **11 check groups** — domain info, stored credentials, ACL abuse, GPO,
+  Kerberos delegation, AD CS (ESC1–ESC8), privilege escalation, network,
+  infrastructure, vulnerabilities, persistence.
+- **Attack paths** — builds a BloodHound-style graph, then shows the shortest
+  path from your account to Domain Admin. Each edge names the weakness (for
+  example `GenericAll`, `WriteDacl`, `DCSync`) and how it is normally abused.
+- **Optional local layer (`--active`)** — checks which hosts your account is
+  local admin on, dumps local SAM hashes and LSA secrets with impacket, then
+  joins the local → domain hop into the same path.
+- **Evidence for every finding** — severity, confidence, what proves it, how
+  to verify it by hand, and how to fix it.
+- **Reports** — HTML, JSON, CSV, a terminal dashboard, and a snapshot you can
+  analyse offline later.
 
 ## Installation
 
-The repo is public — no key or token needed.
+Two ways. Pick one.
 
-**Recommended — `pipx`** (command on `PATH`, no venv activation):
+**Way 1 — you just want to use it**
 
 ```bash
-# straight from git, no clone
 pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
-
-# or from a clone, editable so source edits take effect immediately
-git clone https://github.com/0xs4h4/corvid.git
-pipx install --editable ./corvid/corvid-ad
-
 corvid-ad doctor
 ```
 
-To update a non-editable install after new commits: `pipx reinstall corvid-ad`.
-
-**Dev venv** — needed for `pytest` and the `[active]` impacket extra:
+**Way 2 — you want to change the code**
 
 ```bash
-# On Kali Linux / Debian
+git clone https://github.com/0xs4h4/corvid.git
+pipx install --editable ./corvid/corvid-ad
+```
+
+Updating: Way 1 → `pipx reinstall corvid-ad`. Way 2 → `git pull`.
+
+**Need the dev extras?**
+
+`pytest` and the `--active` impacket layer need a project venv:
+
+```bash
 sudo apt-get install -y python3-venv python3-dev libkrb5-dev libsasl2-dev libldap2-dev
 python3 -m venv .venv
 source .venv/bin/activate
-pip install .              # read-only layer
-pip install .[active]      # + impacket for the --active layer
+pip install .[active]
 ```
 
 Or with `uv`:

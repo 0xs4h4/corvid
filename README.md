@@ -1,26 +1,37 @@
 # corvid
 
-Personal offensive-security toolkit — the things I actually reach for in OSCP
-labs and authorised internal assessments. Recon first, then the targeted work.
+My offensive-security toolkit. I use it in OSCP labs and on authorised
+assessments.
 
-**corvid** (the crow family): smart, opportunistic, remembers faces, uses
-tools. That is the job.
+`corvid` means the crow family. Crows are smart. They watch, they remember,
+and they use tools. That is the job.
 
-Every tool is its own directory, its own package, its own tests, and installs
-as a `corvid-` prefixed command:
+Two tools. Each one lives in its own folder:
 
 ```
 corvid/
-├── corvid-ad/       # AD attack-surface + exploitability scanner
-├── corvid-sweep/    # two-pass TCP discovery + service detection
-└── README.md
+├── corvid-ad/      # looks at Active Directory (read only)
+└── corvid-sweep/   # finds open ports on many hosts
 ```
 
 ## Install
 
-The repo is public — no key or token needed, clone or install straight from git.
+Two ways. Pick one.
 
-**Option A — clone, then editable install** (use this when you plan to edit):
+**Way 1 — you just want to use it**
+
+Copy these two lines. Nothing to download by hand:
+
+```bash
+pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
+pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-sweep"
+```
+
+Done. Now type `corvid-ad` or `corvid-sweep` anywhere in your terminal.
+
+**Way 2 — you want to change the code**
+
+Clone first. Then install it so your edits take effect right away:
 
 ```bash
 git clone https://github.com/0xs4h4/corvid.git
@@ -29,72 +40,91 @@ pipx install --editable ./corvid-ad
 pipx install --editable ./corvid-sweep
 ```
 
-Editable installs mean source edits take effect immediately — `git pull` is
-enough to stay current (only `pipx reinstall <tool>` when dependencies move).
+**Updating later**
 
-**Option B — straight from git, no clone:**
+- Way 1: run `pipx reinstall corvid-ad`
+- Way 2: run `git pull` — that's it
+
+**No pipx?**
 
 ```bash
-pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
-pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-sweep"
+sudo apt install pipx && pipx ensurepath
 ```
 
-That pins whatever `main` holds at install time; to pull a newer commit run
-`pipx reinstall corvid-ad` (or swap `pipx install` for `pipx reinstall
---force`). Both forms verified on Kali with pipx 1.15.
-
-Either way you end up with two commands on `PATH`:
+**Check it works**
 
 ```bash
 corvid-ad --version
 corvid-sweep --version
 ```
 
-## `corvid-ad`
+## corvid-ad
 
-Read-only Active Directory attack-surface scanner. LDAP(S) collection,
-attack-path graph, JSON/CSV/HTML reporting. It never requests Kerberos hashes,
-cracks passwords, modifies AD, or exploits anything.
+This tool looks at Active Directory.
+
+You give it a domain and one normal account. It reads whatever that account is
+allowed to read. Then it tells you what is weak, and how someone could move
+up from that account to Domain Admin.
+
+What it reports:
+
+- who can take over which user or computer
+- weak password settings on the domain
+- risky Kerberos delegation settings
+- accounts that never expire or store passwords weakly
+- attack paths, drawn as a graph
+- the same findings as JSON, CSV and HTML
+
+What it does **not** do:
+
+- it does not guess or crack passwords
+- it does not change anything in AD
+- it does not run exploits
+
+So it is safe to point at a live domain. It only reads.
 
 ```bash
-corvid-ad doctor
-corvid-ad checks --list
-corvid-ad scan --domain corp.example --dc-ip 10.0.0.10 --username <user> \
-    --mode quick -o reports/
+corvid-ad doctor                                   # check dependencies first
+corvid-ad checks --list                            # list the checks
+corvid-ad scan --domain corp.example --dc-ip 10.0.0.10 \
+    --username jdoe --mode quick -o reports/
 ```
 
-Modes: `quick` (low-impact), `full` (all modules), or `--modules acl,gpo,adcs`
-for focused runs. Password prompted securely or via `CORVID_AD_PASSWORD`.
-`--active/--hosts` adds the impacket SAM/LSA layer (needs the `[active]` extra).
+Modes: `quick` is the light one. `full` runs everything. `--modules acl,gpo`
+runs only the checks you name. The password is asked for at the prompt, or you
+can set `CORVID_AD_PASSWORD`.
 
-## `corvid-sweep`
+## corvid-sweep
 
-Two-pass TCP discovery: pass 1 finds what is listening across every target,
-pass 2 runs version detection only on ports that answered.
+This tool looks at the network.
+
+It takes a list of hosts and scans them in two passes. Pass one: which ports
+are open. Pass two: what service and version runs on those ports.
+
+Why two passes? You see the whole picture first. Then you spend the slow
+version scan only on ports that answered.
 
 ```bash
-corvid-sweep -i targets.txt                  # SYN scan (root), timing 4
-corvid-sweep -i targets.txt --connect        # TCP connect scan, no root
-corvid-sweep -i targets.txt --resume runs/X  # reuse finished scans
+corvid-sweep -i targets.txt                  # SYN scan, needs root
+corvid-sweep -i targets.txt --connect        # connect scan, no root needed
+corvid-sweep -i targets.txt --resume runs/X  # reuse scans already done
 ```
 
-Each run creates a timestamped folder with the nmap artefacts plus
-`report.txt`.
+Each run makes a new folder with the nmap files and one `report.txt` you can
+read at the end.
 
 ## History
 
-`corvid-ad` grew out of a 566-line LDAPS MVP (`ad_recon.py`, 8 modules,
-v0.2.0). Removed once the packaged scanner reached parity; the code is still
-in git history:
+`corvid-ad` started life as a 566-line script (`ad_recon.py`, 8 checks,
+v0.2.0). I removed it once the packaged version did everything it did. The old
+code is still in git history:
 
 ```bash
 git log --oneline --all -- '*ad_recon*'
-git show <commit>:corvid-ad-recon.py
 ```
 
-## Conventions
+## Notes
 
-- Python 3.11+; Kali is PEP 668, so install with `pipx`, never system `pip`.
-- Lab/engagement tooling only — run it against systems you are authorised to
-  test.
-- Tests live with each tool: `cd corvid-ad && .venv/bin/python -m pytest -q`.
+- Python 3.11 or newer. On Kali, install with `pipx`, not system `pip`.
+- Use it only on systems you are allowed to test.
+- Each tool has its own tests: `cd corvid-ad && .venv/bin/python -m pytest -q`.
