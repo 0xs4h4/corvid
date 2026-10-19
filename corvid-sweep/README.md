@@ -9,8 +9,16 @@ time to one host. Pass 1 is cheap discovery across everything; pass 2 spends
 
 ## Install
 
+Private repo — SSH key authorised on GitHub first.
+
 ```bash
-pipx install --editable ~/Projects/corvid/corvid-sweep
+# from a clone (editable, for when you're editing)
+git clone git@github.com:0xs4h4/corvid.git
+pipx install --editable ./corvid/corvid-sweep
+
+# or straight from git, no clone
+pipx install "git+ssh://git@github.com/0xs4h4/corvid.git#subdirectory=corvid-sweep"
+
 corvid-sweep --help
 ```
 

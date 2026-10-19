@@ -38,6 +38,25 @@ purple-team exercises).
 
 ## Installation
 
+The repo is private — your SSH key has to be authorised on GitHub first.
+
+**Recommended — `pipx`** (command on `PATH`, no venv activation):
+
+```bash
+# straight from git, no clone
+pipx install "git+ssh://git@github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
+
+# or from a clone, editable so source edits take effect immediately
+git clone git@github.com:0xs4h4/corvid.git
+pipx install --editable ./corvid/corvid-ad
+
+corvid-ad doctor
+```
+
+To update a non-editable install after new commits: `pipx reinstall corvid-ad`.
+
+**Dev venv** — needed for `pytest` and the `[active]` impacket extra:
+
 ```bash
 # On Kali Linux / Debian
 sudo apt-get install -y python3-venv python3-dev libkrb5-dev libsasl2-dev libldap2-dev
