@@ -38,13 +38,15 @@ python3 corvid-sweep.py -i targets.txt --resume runs/  # reuse finished scans
   before committing to one host.
 - Pass 2: service/version detection only on ports that answered.
 
-### `corvid-ad-recon.py`
-Earlier standalone LDAPS scanner — the MVP that `corvid-ad` grew out of.
-Kept for quick single-purpose runs and as a reference implementation.
+## History
+
+`corvid-ad` grew out of a 566-line LDAPS MVP (`ad_recon.py`, v0.2.0). It was
+removed once the packaged scanner reached feature parity — the code is still
+in git history:
 
 ```bash
-python3 corvid-ad-recon.py scan --domain corp.example --dc-ip 10.0.0.10 \
-    --username <user> --mode quick -o reports/
+git log --oneline --all -- '*ad_recon*'
+git show <commit>:corvid-ad-recon.py
 ```
 
 ## Conventions
