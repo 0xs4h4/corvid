@@ -18,13 +18,12 @@ corvid/
 
 ## Install
 
-The repo is private — your SSH key has to be authorised on GitHub first
-(`ssh -T git@github.com` should greet you as `0xs4h4`).
+The repo is public — no key or token needed, clone or install straight from git.
 
 **Option A — clone, then editable install** (use this when you plan to edit):
 
 ```bash
-git clone git@github.com:0xs4h4/corvid.git
+git clone https://github.com/0xs4h4/corvid.git
 cd corvid
 pipx install --editable ./corvid-ad
 pipx install --editable ./corvid-sweep
@@ -36,8 +35,8 @@ enough to stay current (only `pipx reinstall <tool>` when dependencies move).
 **Option B — straight from git, no clone:**
 
 ```bash
-pipx install "git+ssh://git@github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
-pipx install "git+ssh://git@github.com/0xs4h4/corvid.git#subdirectory=corvid-sweep"
+pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
+pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-sweep"
 ```
 
 That pins whatever `main` holds at install time; to pull a newer commit run

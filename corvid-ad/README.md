@@ -38,16 +38,16 @@ purple-team exercises).
 
 ## Installation
 
-The repo is private — your SSH key has to be authorised on GitHub first.
+The repo is public — no key or token needed.
 
 **Recommended — `pipx`** (command on `PATH`, no venv activation):
 
 ```bash
 # straight from git, no clone
-pipx install "git+ssh://git@github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
+pipx install "git+https://github.com/0xs4h4/corvid.git#subdirectory=corvid-ad"
 
 # or from a clone, editable so source edits take effect immediately
-git clone git@github.com:0xs4h4/corvid.git
+git clone https://github.com/0xs4h4/corvid.git
 pipx install --editable ./corvid/corvid-ad
 
 corvid-ad doctor
