@@ -1,0 +1,369 @@
+{
+  "domain": {
+    "name": "corp.local",
+    "dns_root": "corp.local",
+    "domain_sid": "S-1-5-21-1000000000-2000000000-3000000000",
+    "functional_level": "2016",
+    "forest": null,
+    "domain_controllers": [
+      "dc01.corp.local"
+    ],
+    "fsmo_roles": {},
+    "password_policy": {
+      "machineAccountQuota": 10,
+      "lockoutThreshold": 0,
+      "minPwdLength": 7,
+      "pwdProperties": 0
+    },
+    "default_naming_context": "DC=corp,DC=local",
+    "configuration_context": "CN=Configuration,DC=corp,DC=local",
+    "schema_context": "CN=Schema,CN=Configuration,DC=corp,DC=local",
+    "acl": {
+      "owner_sid": "S-1-5-21-1000000000-2000000000-3000000000-512",
+      "group_sid": "S-1-5-21-1000000000-2000000000-3000000000-513",
+      "dacl": [
+        {
+          "sid": "S-1-5-21-1000000000-2000000000-3000000000-1601",
+          "type": "OBJECT_ALLOW",
+          "access_mask": 0,
+          "flags": 0,
+          "inherited": false,
+          "rights": [
+            "DCSync (GetChanges)"
+          ],
+          "object_type": "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2"
+        }
+      ]
+    }
+  },
+  "users": {
+    "CN=Administrator,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=Administrator,CN=Users,DC=corp,DC=local",
+      "name": "Administrator",
+      "object_class": "user",
+      "sAMAccountName": "Administrator",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-500",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "memberOf": [],
+      "servicePrincipalName": [],
+      "userAccountControl": 0,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    },
+    "CN=krbtgt,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=krbtgt,CN=Users,DC=corp,DC=local",
+      "name": "krbtgt",
+      "object_class": "user",
+      "sAMAccountName": "krbtgt",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-502",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "memberOf": [],
+      "servicePrincipalName": [],
+      "userAccountControl": 0,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    },
+    "CN=svc_dcsync,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=svc_dcsync,CN=Users,DC=corp,DC=local",
+      "name": "svc_dcsync",
+      "object_class": "user",
+      "sAMAccountName": "svc_dcsync",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-1601",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "memberOf": [],
+      "servicePrincipalName": [],
+      "userAccountControl": 0,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    },
+    "CN=svc_sql,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=svc_sql,CN=Users,DC=corp,DC=local",
+      "name": "svc_sql",
+      "object_class": "user",
+      "sAMAccountName": "svc_sql",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-1602",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "memberOf": [],
+      "servicePrincipalName": [
+        "MSSQLSvc/sql01.corp.local:1433"
+      ],
+      "userAccountControl": 0,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    },
+    "CN=asrep_user,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=asrep_user,CN=Users,DC=corp,DC=local",
+      "name": "asrep_user",
+      "object_class": "user",
+      "sAMAccountName": "asrep_user",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-1603",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "memberOf": [],
+      "servicePrincipalName": [],
+      "userAccountControl": 4194304,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    },
+    "CN=reversible_user,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=reversible_user,CN=Users,DC=corp,DC=local",
+      "name": "reversible_user",
+      "object_class": "user",
+      "sAMAccountName": "reversible_user",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-1604",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "memberOf": [],
+      "servicePrincipalName": [],
+      "userAccountControl": 128,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    },
+    "CN=victim_admin,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=victim_admin,CN=Users,DC=corp,DC=local",
+      "name": "victim_admin",
+      "object_class": "user",
+      "sAMAccountName": "victim_admin",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-1605",
+      "description": null,
+      "attributes": {},
+      "acl": {
+        "owner_sid": "S-1-5-21-1000000000-2000000000-3000000000-512",
+        "group_sid": "S-1-5-21-1000000000-2000000000-3000000000-513",
+        "dacl": [
+          {
+            "sid": "S-1-5-21-1000000000-2000000000-3000000000-513",
+            "type": "ALLOW",
+            "access_mask": 0,
+            "flags": 0,
+            "inherited": false,
+            "rights": [
+              "GenericAll"
+            ],
+            "object_type": ""
+          }
+        ]
+      },
+      "memberOf": [],
+      "servicePrincipalName": [],
+      "userAccountControl": 0,
+      "lastLogonTimestamp": null,
+      "pwdLastSet": null,
+      "adminCount": 0,
+      "primaryGroupID": 513,
+      "msds_AllowedToDelegateTo": []
+    }
+  },
+  "groups": {
+    "CN=Domain Admins,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=Domain Admins,CN=Users,DC=corp,DC=local",
+      "name": "Domain Admins",
+      "object_class": "group",
+      "sAMAccountName": "Domain Admins",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-512",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "member": [
+        "CN=Administrator,CN=Users,DC=corp,DC=local"
+      ],
+      "adminCount": 0,
+      "groupType": 2147483650
+    },
+    "CN=Domain Users,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=Domain Users,CN=Users,DC=corp,DC=local",
+      "name": "Domain Users",
+      "object_class": "group",
+      "sAMAccountName": "Domain Users",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-513",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "member": [],
+      "adminCount": 0,
+      "groupType": 2147483650
+    },
+    "CN=DnsAdmins,CN=Users,DC=corp,DC=local": {
+      "distinguished_name": "CN=DnsAdmins,CN=Users,DC=corp,DC=local",
+      "name": "DnsAdmins",
+      "object_class": "group",
+      "sAMAccountName": "DnsAdmins",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-1101",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "member": [],
+      "adminCount": 0,
+      "groupType": 2147483650
+    }
+  },
+  "computers": {
+    "CN=WS01,CN=Computers,DC=corp,DC=local": {
+      "distinguished_name": "CN=WS01,CN=Computers,DC=corp,DC=local",
+      "name": "WS01",
+      "object_class": "computer",
+      "sAMAccountName": "WS01$",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-2000",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "servicePrincipalName": [
+        "HOST/WS01.corp.local"
+      ],
+      "operatingSystem": "Windows Server 2019",
+      "userAccountControl": 524288,
+      "msds_AllowedToActOnBehalfOfOtherIdentity": "",
+      "msds_AllowedToDelegateTo": [],
+      "dNSHostName": "WS01.corp.local"
+    },
+    "CN=SQL01,CN=Computers,DC=corp,DC=local": {
+      "distinguished_name": "CN=SQL01,CN=Computers,DC=corp,DC=local",
+      "name": "SQL01",
+      "object_class": "computer",
+      "sAMAccountName": "SQL01$",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-2001",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "servicePrincipalName": [
+        "HOST/SQL01.corp.local"
+      ],
+      "operatingSystem": "Windows Server 2019",
+      "userAccountControl": 0,
+      "msds_AllowedToActOnBehalfOfOtherIdentity": "",
+      "msds_AllowedToDelegateTo": [
+        "cifs/dc01.corp.local"
+      ],
+      "dNSHostName": "SQL01.corp.local"
+    },
+    "CN=FILE01,CN=Computers,DC=corp,DC=local": {
+      "distinguished_name": "CN=FILE01,CN=Computers,DC=corp,DC=local",
+      "name": "FILE01",
+      "object_class": "computer",
+      "sAMAccountName": "FILE01$",
+      "objectSid": "S-1-5-21-1000000000-2000000000-3000000000-2002",
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "servicePrincipalName": [
+        "HOST/FILE01.corp.local"
+      ],
+      "operatingSystem": "Windows Server 2019",
+      "userAccountControl": 0,
+      "msds_AllowedToActOnBehalfOfOtherIdentity": "S-1-5-21-1000000000-2000000000-3000000000-1602",
+      "msds_AllowedToDelegateTo": [],
+      "dNSHostName": "FILE01.corp.local"
+    }
+  },
+  "gpos": {},
+  "cas": {
+    "CN=corp-CA,CN=Enrollment Services,CN=Public Key Services,CN=Services,CN=Configuration,DC=corp,DC=local": {
+      "distinguished_name": "CN=corp-CA,CN=Enrollment Services,CN=Public Key Services,CN=Services,CN=Configuration,DC=corp,DC=local",
+      "name": "corp-CA",
+      "object_class": "pKIEnrollmentService",
+      "sAMAccountName": null,
+      "objectSid": null,
+      "description": null,
+      "attributes": {},
+      "acl": null,
+      "dNSHostName": "ca.corp.local",
+      "cACertificateDN": null,
+      "enrollPerm": []
+    }
+  },
+  "templates": {
+    "CN=ESC1-Template,CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=corp,DC=local": {
+      "distinguished_name": "CN=ESC1-Template,CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=corp,DC=local",
+      "name": "ESC1-Template",
+      "object_class": "pKICertificateTemplate",
+      "sAMAccountName": null,
+      "objectSid": null,
+      "description": null,
+      "attributes": {},
+      "acl": {
+        "owner_sid": "S-1-5-21-1000000000-2000000000-3000000000-512",
+        "group_sid": "S-1-5-21-1000000000-2000000000-3000000000-513",
+        "dacl": [
+          {
+            "sid": "S-1-5-21-1000000000-2000000000-3000000000-513",
+            "type": "OBJECT_ALLOW",
+            "access_mask": 0,
+            "flags": 0,
+            "inherited": false,
+            "rights": [
+              "Enroll"
+            ],
+            "object_type": "0e10c968-78fb-11d2-90d4-00c04f79dc55"
+          }
+        ]
+      },
+      "msPKI_Certificate_Name_Flag": 1,
+      "msPKI_Enrollment_Flag": 0,
+      "pKIExtendedKeyUsage": [
+        "1.3.6.1.5.5.7.3.2"
+      ],
+      "msPKI_RA_Signature": 0,
+      "nTSecurityDescriptor": null
+    }
+  },
+  "trusts": {},
+  "ous": {},
+  "sid_map": {
+    "S-1-5-21-1000000000-2000000000-3000000000-500": "CN=Administrator,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-502": "CN=krbtgt,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-512": "CN=Domain Admins,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-513": "CN=Domain Users,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-1101": "CN=DnsAdmins,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-1601": "CN=svc_dcsync,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-1602": "CN=svc_sql,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-1603": "CN=asrep_user,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-1604": "CN=reversible_user,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-1605": "CN=victim_admin,CN=Users,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-2000": "CN=WS01,CN=Computers,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-2001": "CN=SQL01,CN=Computers,DC=corp,DC=local",
+    "S-1-5-21-1000000000-2000000000-3000000000-2002": "CN=FILE01,CN=Computers,DC=corp,DC=local"
+  },
+  "name_map": {
+    "CN=Administrator,CN=Users,DC=corp,DC=local": "Administrator",
+    "CN=krbtgt,CN=Users,DC=corp,DC=local": "krbtgt",
+    "CN=Domain Admins,CN=Users,DC=corp,DC=local": "Domain Admins",
+    "CN=Domain Users,CN=Users,DC=corp,DC=local": "Domain Users",
+    "CN=DnsAdmins,CN=Users,DC=corp,DC=local": "DnsAdmins",
+    "CN=svc_dcsync,CN=Users,DC=corp,DC=local": "svc_dcsync",
+    "CN=svc_sql,CN=Users,DC=corp,DC=local": "svc_sql",
+    "CN=asrep_user,CN=Users,DC=corp,DC=local": "asrep_user",
+    "CN=reversible_user,CN=Users,DC=corp,DC=local": "reversible_user",
+    "CN=victim_admin,CN=Users,DC=corp,DC=local": "victim_admin",
+    "CN=WS01,CN=Computers,DC=corp,DC=local": "WS01$",
+    "CN=SQL01,CN=Computers,DC=corp,DC=local": "SQL01$",
+    "CN=FILE01,CN=Computers,DC=corp,DC=local": "FILE01$"
+  }
+}
