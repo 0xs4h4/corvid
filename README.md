@@ -1,43 +1,55 @@
-# pentest-tools
+# corvid
 
-Personal reconnaissance / assessment scripts used in OSCP labs and authorised
-internal assessments. Private by default — nothing here is a public release.
+Personal offensive-security toolkit — the things I actually reach for in OSCP
+labs and authorised internal assessments. Recon first, then the targeted work.
 
-## netsweep.py
+**corvid** (the crow family): smart, opportunistic, remembers faces, uses
+tools. That is the job. Every tool lives here under the `corvid-` prefix so
+the family stays recognisable.
 
+## Tools
+
+### `corvid-ad`
+Read-only Active Directory attack-surface and exploitability scanner. LDAP(S)
+collection, attack-path graph, JSON/CSV/HTML reporting. It never requests
+Kerberos hashes, cracks passwords, modifies AD, or exploits anything.
+
+```bash
+pipx install --editable ./corvid-ad
+corvid-ad doctor
+corvid-ad scan --domain corp.example --dc-ip 10.0.0.10 --username <user> \
+    --mode quick -o reports/
+```
+
+Modes: `quick`, `full`, or `--modules acl,gpo,...` for focused runs. Password
+is prompted securely (or set `CORVID_AD_PASSWORD`).
+
+### `corvid-sweep`
 Two-pass TCP discovery across every host in a target list, then service
 detection on the open ports, followed by a text report.
 
 ```bash
-python3 netsweep.py -i targets.txt -o runs/                   # SYN scan, timing 4
-python3 netsweep.py -i targets.txt --connect                  # TCP connect scan
-python3 netsweep.py -i targets.txt --resume runs/             # reuse finished scans
+python3 corvid-sweep.py -i targets.txt -o runs/        # SYN scan, timing 4
+python3 corvid-sweep.py -i targets.txt --connect       # TCP connect scan
+python3 corvid-sweep.py -i targets.txt --resume runs/  # reuse finished scans
 ```
 
-- Pass 1: discovery across all targets (gives the full attack-surface picture
-  before committing to one host).
-- Pass 2: service/version detection on discovered ports only.
-- Output: per-target text report plus the nmap artefacts it parsed.
+- Pass 1: discovery across every target — you see the whole attack surface
+  before committing to one host.
+- Pass 2: service/version detection only on ports that answered.
 
-## ad_recon.py
-
-Read-only Active Directory attack-surface scanner over LDAPS. Collects
-directory metadata and reports evidence-backed conditions — it never requests
-Kerberos hashes, cracks passwords, modifies AD, or exploits anything.
+### `corvid-ad-recon.py`
+Earlier standalone LDAPS scanner — the MVP that `corvid-ad` grew out of.
+Kept for quick single-purpose runs and as a reference implementation.
 
 ```bash
-python3 ad_recon.py scan --domain corp.example --dc-ip 10.0.0.10 \
+python3 corvid-ad-recon.py scan --domain corp.example --dc-ip 10.0.0.10 \
     --username <user> --mode quick -o reports/
 ```
 
-Modes: `quick`, `full`, or `--modules acl,gpo,...` for focused runs. Password
-is prompted securely (never passed on the command line).
+## Conventions
 
-An expanded fork of this scanner lives in
-[adscan](https://github.com/0xs4h4/adscan).
-
-## Notes
-
-- Both scripts are lab/engagement tooling; only run them against systems you
-  are authorised to test.
 - Python 3.11+.
+- Lab/engagement tooling only — run it against systems you are authorised to
+  test.
+- Tests: `cd corvid-ad && .venv/bin/python -m pytest -q`.

@@ -1,0 +1,24 @@
+# corvid-ad default configuration.
+
+ldap:
+  port: 389
+  use_ssl: false
+  connect_timeout: 10
+  receive_timeout: 30
+  page_size: 1000
+  auth: NTLM            # NTLM | SIMPLE | ANONYMOUS
+
+scan:
+  mode: quick
+  concurrency: 4
+  rate_limit: 0.05       # seconds between paged queries
+  retries: 3
+  backoff: 2.0
+
+output:
+  dir: reports
+  formats: [json, csv, html]
+
+logging:
+  level: INFO
+  file: null
