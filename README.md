@@ -43,7 +43,11 @@ pipx install --editable ./corvid-sweep
 **Updating later**
 
 - Way 1: run `pipx reinstall corvid-ad`
-- Way 2: run `git pull` — that's it
+- Way 2: run `git pull` — that's it, the command uses the new code next time
+- If the update touched `pyproject.toml` (new or changed dependencies), run
+  `pipx reinstall corvid-ad` as well
+- If you edited the clone yourself and git complains: `git stash`, `git pull`,
+  `git stash pop`
 
 **No pipx?**
 
