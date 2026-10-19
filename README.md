@@ -4,44 +4,63 @@ Personal offensive-security toolkit — the things I actually reach for in OSCP
 labs and authorised internal assessments. Recon first, then the targeted work.
 
 **corvid** (the crow family): smart, opportunistic, remembers faces, uses
-tools. That is the job. Every tool lives here under the `corvid-` prefix so
-the family stays recognisable.
+tools. That is the job.
 
-## Tools
+Every tool is its own directory, its own package, its own tests, and installs
+as a `corvid-` prefixed command:
 
-### `corvid-ad`
-Read-only Active Directory attack-surface and exploitability scanner. LDAP(S)
-collection, attack-path graph, JSON/CSV/HTML reporting. It never requests
-Kerberos hashes, cracks passwords, modifies AD, or exploits anything.
+```
+corvid/
+├── corvid-ad/       # AD attack-surface + exploitability scanner
+├── corvid-sweep/    # two-pass TCP discovery + service detection
+└── README.md
+```
+
+## Install
 
 ```bash
 pipx install --editable ./corvid-ad
+pipx install --editable ./corvid-sweep
+```
+
+Editable installs mean source edits take effect immediately — `git pull` is
+enough to stay current (only `pipx reinstall <tool>` when dependencies move).
+
+## `corvid-ad`
+
+Read-only Active Directory attack-surface scanner. LDAP(S) collection,
+attack-path graph, JSON/CSV/HTML reporting. It never requests Kerberos hashes,
+cracks passwords, modifies AD, or exploits anything.
+
+```bash
 corvid-ad doctor
+corvid-ad checks --list
 corvid-ad scan --domain corp.example --dc-ip 10.0.0.10 --username <user> \
     --mode quick -o reports/
 ```
 
-Modes: `quick`, `full`, or `--modules acl,gpo,...` for focused runs. Password
-is prompted securely (or set `CORVID_AD_PASSWORD`).
+Modes: `quick` (low-impact), `full` (all modules), or `--modules acl,gpo,adcs`
+for focused runs. Password prompted securely or via `CORVID_AD_PASSWORD`.
+`--active/--hosts` adds the impacket SAM/LSA layer (needs the `[active]` extra).
 
-### `corvid-sweep`
-Two-pass TCP discovery across every host in a target list, then service
-detection on the open ports, followed by a text report.
+## `corvid-sweep`
+
+Two-pass TCP discovery: pass 1 finds what is listening across every target,
+pass 2 runs version detection only on ports that answered.
 
 ```bash
-python3 corvid-sweep.py -i targets.txt -o runs/        # SYN scan, timing 4
-python3 corvid-sweep.py -i targets.txt --connect       # TCP connect scan
-python3 corvid-sweep.py -i targets.txt --resume runs/  # reuse finished scans
+corvid-sweep -i targets.txt                  # SYN scan (root), timing 4
+corvid-sweep -i targets.txt --connect        # TCP connect scan, no root
+corvid-sweep -i targets.txt --resume runs/X  # reuse finished scans
 ```
 
-- Pass 1: discovery across every target — you see the whole attack surface
-  before committing to one host.
-- Pass 2: service/version detection only on ports that answered.
+Each run creates a timestamped folder with the nmap artefacts plus
+`report.txt`.
 
 ## History
 
-`corvid-ad` grew out of a 566-line LDAPS MVP (`ad_recon.py`, v0.2.0). It was
-removed once the packaged scanner reached feature parity — the code is still
+`corvid-ad` grew out of a 566-line LDAPS MVP (`ad_recon.py`, 8 modules,
+v0.2.0). Removed once the packaged scanner reached parity; the code is still
 in git history:
 
 ```bash
@@ -51,7 +70,7 @@ git show <commit>:corvid-ad-recon.py
 
 ## Conventions
 
-- Python 3.11+.
+- Python 3.11+; Kali is PEP 668, so install with `pipx`, never system `pip`.
 - Lab/engagement tooling only — run it against systems you are authorised to
   test.
-- Tests: `cd corvid-ad && .venv/bin/python -m pytest -q`.
+- Tests live with each tool: `cd corvid-ad && .venv/bin/python -m pytest -q`.

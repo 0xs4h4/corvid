@@ -1,0 +1,2 @@
+[console_scripts]
+corvid-sweep = corvid_sweep.cli:main

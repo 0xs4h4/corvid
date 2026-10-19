@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/corvid_sweep/__init__.py
+src/corvid_sweep/cli.py
+src/corvid_sweep.egg-info/PKG-INFO
+src/corvid_sweep.egg-info/SOURCES.txt
+src/corvid_sweep.egg-info/dependency_links.txt
+src/corvid_sweep.egg-info/entry_points.txt
+src/corvid_sweep.egg-info/requires.txt
+src/corvid_sweep.egg-info/top_level.txt
+tests/test_cli.py

@@ -14,6 +14,8 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
+from . import __version__
+
 TARGET_COLORS = (39, 213, 220, 118, 75, 203, 177, 81)
 
 
@@ -413,9 +415,11 @@ def run_resumed_scans(records, folder, started, nmap, args):
 def main():
     run_started = time.monotonic()
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version',
+                        version=f'corvid-sweep {__version__}')
     parser.add_argument('-i', '--targets', type=Path, default=Path('targets.txt'))
     parser.add_argument('-o', '--output', type=Path,
-                        default=Path(__file__).resolve().parent / 'output')
+                        default=Path('output'))
     parser.add_argument('--timing', choices=['3', '4'], default='4')
     parser.add_argument('--connect', action='store_true', help='TCP connect scan instead of privileged SYN scan')
     parser.add_argument('--resume', type=Path, help='Reuse completed scans in an existing run directory')
