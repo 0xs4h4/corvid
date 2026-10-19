@@ -1,6 +1,6 @@
 [project]
 name = "corvid-sweep"
-version = "0.2.0"
+version = "0.2.1"
 description = "Two-pass TCP discovery across multiple targets, then service detection and a text report"
 readme = "README.md"
 requires-python = ">=3.11"

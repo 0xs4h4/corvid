@@ -447,6 +447,16 @@ def give_back(path):
         pass
 
 
+def count_open_ports(records):
+    """Total open ports across every scan result."""
+    total = 0
+    for record in records:
+        for _label, scan in record.get('scans', []):
+            if scan:
+                total += len(scan.get('ports', []))
+    return total
+
+
 def main():
     run_started = time.monotonic()
     parser = argparse.ArgumentParser(description=__doc__)
@@ -499,6 +509,14 @@ def main():
                                                 args.connect, started)
     print_completion_status(records, colors)
     print_terminal_summary(records)
+
+    no_ports = count_open_ports(records) == 0
+    if no_ports:
+        print()
+        print('  [!] No open TCP ports on ANY target.')
+        print('  [!] A full sweep of unreachable hosts looks exactly like this.')
+        print('  [!] Check the tunnel, the routes, and that the lab is running')
+        print('      before trusting this result.')
     elapsed = int(time.monotonic() - run_started)
     minutes, seconds = divmod(elapsed, 60)
     duration = f'{minutes} min {seconds} sec'
@@ -508,7 +526,11 @@ def main():
     print(f'Total Scan : {duration}')
     fix_output_ownership(folder)
     give_back(args.output)
-    return 130 if interrupted else (1 if failed else 0)
+    if interrupted:
+        return 130
+    if failed:
+        return 1
+    return 2 if no_ports else 0
 
 
 if __name__ == '__main__':

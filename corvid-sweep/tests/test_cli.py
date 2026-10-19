@@ -5,7 +5,7 @@ import sys
 import pytest
 
 from corvid_sweep import __version__
-from corvid_sweep.cli import (create_run_folder, fix_output_ownership,
+from corvid_sweep.cli import (count_open_ports, create_run_folder, fix_output_ownership,
                               give_back, main)
 
 
@@ -54,3 +54,12 @@ def test_create_run_folder_names_and_increments(tmp_path):
     second = create_run_folder(tmp_path, date="20261019")
     assert first.name == "corvid-sweep-20261019-1"
     assert second.name == "corvid-sweep-20261019-2"
+
+
+def test_count_open_ports():
+    records = [
+        {"target": "10.0.0.1", "scans": [("tcp", {"ports": [22, 80]})]},
+        {"target": "10.0.0.2", "scans": [("tcp", {"ports": []})]},
+    ]
+    assert count_open_ports(records) == 2
+    assert count_open_ports([{"target": "x", "scans": []}]) == 0
