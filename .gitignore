@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+runs/
+reports/
+*.xml
+*.gnmap
+targets.txt
