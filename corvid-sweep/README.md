@@ -41,18 +41,27 @@ python3 -m corvid_sweep.cli -i targets.txt
 ```bash
 corvid-sweep -i targets.txt                    # SYN scan (needs root), timing 4
 corvid-sweep -i targets.txt --connect          # TCP connect scan, no root
-corvid-sweep -i targets.txt --resume runs/X    # reuse finished scans in a run dir
-corvid-sweep -i targets.txt -o runs/           # write results under runs/
+corvid-sweep -i targets.txt --resume corvid-sweep-output/corvid-sweep-20261019-1
+corvid-sweep -i targets.txt -o scans/          # write runs under scans/
 ```
 
 - `-i, --targets` — file with one host/IP/CIDR per line (default `targets.txt`).
-- `-o, --output` — parent directory for run folders (default `./output`).
+- `-o, --output` — parent directory for run folders (default
+  `./corvid-sweep-output`).
 - `--timing 3|4` — nmap timing template (default 4).
 - `--connect` — use `-sT` instead of `-sS` when you are not root.
 - `--resume` — point at an existing run directory; completed scans are reused.
 
 Each run creates a timestamped folder containing the nmap artefacts and a
-plain-text report.
+plain-text report:
+
+```
+corvid-sweep-output/
+└── corvid-sweep-20261019-1/
+    ├── report.txt
+    ├── all-ipv4-tcp.xml
+    └── all-ipv4-services.xml
+```
 
 Run it with `sudo` and the output is handed back to you (`chown` to
 `SUDO_UID`), so you do not end up with root-owned reports you cannot delete.

@@ -5,7 +5,8 @@ import sys
 import pytest
 
 from corvid_sweep import __version__
-from corvid_sweep.cli import fix_output_ownership, give_back, main
+from corvid_sweep.cli import (create_run_folder, fix_output_ownership,
+                              give_back, main)
 
 
 def test_help_exits_zero(monkeypatch, capsys):
@@ -46,3 +47,10 @@ def test_give_back_noop_for_non_root(tmp_path):
     out.mkdir()
     give_back(out)                          # must not raise without SUDO_UID
     assert out.is_dir()
+
+
+def test_create_run_folder_names_and_increments(tmp_path):
+    first = create_run_folder(tmp_path, date="20261019")
+    second = create_run_folder(tmp_path, date="20261019")
+    assert first.name == "corvid-sweep-20261019-1"
+    assert second.name == "corvid-sweep-20261019-2"

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import getpass
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -53,7 +55,7 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--hashes", help="LMHASH:NTHASH for pass-the-hash (not stored/logged).")
     sp.add_argument("--mode", choices=["quick", "full", "focused"], default="quick")
     sp.add_argument("--modules", help="Comma-separated module names (with --mode focused).")
-    sp.add_argument("--output", "-o", default="reports", help="Output directory.")
+    sp.add_argument("--output", "-o", default="corvid-ad-output", help="Output directory.")
     sp.add_argument("--use-ssl", action="store_true", help="Use LDAPS (port 636).")
     sp.add_argument("--no-password", action="store_true", help="No password (anonymous / env-provided).")
     sp.add_argument("--config", help="Path to YAML config file.")
@@ -68,7 +70,7 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--input", "-i", required=True, help="Directory or snapshot JSON from a prior scan.")
     ap.add_argument("--mode", choices=["quick", "full"], default="full")
     ap.add_argument("--modules", help="Comma-separated module names (optional).")
-    ap.add_argument("--output", "-o", default="reports", help="Output directory.")
+    ap.add_argument("--output", "-o", default="corvid-ad-output", help="Output directory.")
     ap.add_argument("--start", help="Principal to start attack-path search from (sAMAccountName/DN/SID).")
     ap.set_defaults(func=cmd_analyze)
 
@@ -76,7 +78,7 @@ def _build_parser() -> argparse.ArgumentParser:
     rp = sub.add_parser("report", help="Generate reports from a results.json file.")
     rp.add_argument("--input", "-i", required=True, help="Path to results.json.")
     rp.add_argument("--format", choices=["html", "json", "csv"], default="html")
-    rp.add_argument("--output", "-o", default="reports", help="Output directory.")
+    rp.add_argument("--output", "-o", default="corvid-ad-output", help="Output directory.")
     rp.set_defaults(func=cmd_report)
 
     # --- checks ---
@@ -118,6 +120,26 @@ def _run_active(args: argparse.Namespace, opts, password: str, graph):
     result = collector.run(hosts)
     graph.add_active(result, _graph_principal(opts.username))
     return result
+
+
+def _create_run_dir(base: Path, prefix: str = "corvid-ad") -> Path:
+    """Create <prefix>-YYYYMMDD-N under base, incrementing past existing runs."""
+    base.mkdir(parents=True, exist_ok=True)
+    date = dt.datetime.now().strftime("%Y%m%d")
+    pattern = re.compile(rf"^{prefix}-{date}-(\d+)$")
+    highest = 0
+    for entry in base.iterdir():
+        match = pattern.fullmatch(entry.name)
+        if match:
+            highest = max(highest, int(match.group(1)))
+    iteration = highest + 1
+    while True:
+        folder = base / f"{prefix}-{date}-{iteration}"
+        try:
+            folder.mkdir()
+            return folder
+        except FileExistsError:
+            iteration += 1
 
 
 def cmd_scan(args: argparse.Namespace) -> int:
@@ -170,7 +192,7 @@ def cmd_scan(args: argparse.Namespace) -> int:
     else:
         paths = graph.find_paths(start=getattr(args, "start", None))
 
-    out = Path(opts.output_dir)
+    out = _create_run_dir(Path(opts.output_dir))
     json_report.write_json(ctx, out, graph, paths, active_result)
     csv_report.write_csv(ctx, out)
     html_report.write_html(ctx, out, graph, paths)

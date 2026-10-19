@@ -91,12 +91,15 @@ So it is safe to point at a live domain. It only reads.
 corvid-ad doctor                                   # check dependencies first
 corvid-ad checks --list                            # list the checks
 corvid-ad scan --domain corp.example --dc-ip 10.0.0.10 \
-    --username jdoe --mode quick -o reports/
+    --username jdoe --mode quick
 ```
 
 Modes: `quick` is the light one. `full` runs everything. `--modules acl,gpo`
 runs only the checks you name. The password is asked for at the prompt, or you
 can set `CORVID_AD_PASSWORD`.
+
+Each scan writes its own folder: `corvid-ad-output/corvid-ad-YYYYMMDD-N/`
+(HTML, JSON, CSV and a snapshot). Change the parent with `-o`.
 
 ## corvid-sweep
 
@@ -111,11 +114,12 @@ version scan only on ports that answered.
 ```bash
 corvid-sweep -i targets.txt                  # SYN scan, needs root
 corvid-sweep -i targets.txt --connect        # connect scan, no root needed
-corvid-sweep -i targets.txt --resume runs/X  # reuse scans already done
+corvid-sweep -i targets.txt --resume corvid-sweep-output/corvid-sweep-20261019-1
 ```
 
-Each run makes a new folder with the nmap files and one `report.txt` you can
-read at the end.
+Each run makes its own folder, `corvid-sweep-output/corvid-sweep-YYYYMMDD-N/`,
+with the nmap files and one `report.txt` you can read at the end. Change the
+parent with `-o`.
 
 ## History
 

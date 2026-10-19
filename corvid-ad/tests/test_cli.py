@@ -72,3 +72,12 @@ def test_password_not_in_output(tmp_path, capsys):
     cli.main(["analyze", "--input", str(tmp_path), "--mode", "quick", "--output", str(tmp_path / "o")])
     out = capsys.readouterr()
     assert "secretpass" not in out.out
+
+
+def test_create_run_dir_names_and_increments(tmp_path):
+    first = cli._create_run_dir(tmp_path)
+    second = cli._create_run_dir(tmp_path)
+    assert first.name.startswith("corvid-ad-")
+    assert first.name.endswith("-1")
+    assert second.name.endswith("-2")
+    assert first.parent == tmp_path

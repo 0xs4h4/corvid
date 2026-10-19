@@ -78,19 +78,19 @@ docker run --rm corvid-ad --help
 
 ```bash
 # Quick low-impact scan
-corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --mode quick -o reports/
+corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --mode quick
 
 # Full assessment
-corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --mode full -o reports/
+corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --mode full
 
 # Focused modules
 corvid-ad scan --domain corp.local --username audit.user --modules acl,gpo,delegation,adcs
 
 # Offline analysis of a prior snapshot
-corvid-ad analyze --input reports/ --mode full
+corvid-ad analyze --input corvid-ad-output/corvid-ad-20261019-1 --mode full
 
 # Regenerate a report from results.json
-corvid-ad report --input reports/results.json --format html
+corvid-ad report --input corvid-ad-output/corvid-ad-20261019-1/results.json --format html
 
 # List available checks
 corvid-ad checks --list
@@ -98,6 +98,23 @@ corvid-ad checks --list
 # Environment/dependency check
 corvid-ad doctor
 ```
+
+## Output
+
+Every scan gets its own folder, so runs never overwrite each other:
+
+```
+corvid-ad-output/
+└── corvid-ad-20261019-1/
+    ├── report.html
+    ├── results.json
+    ├── findings.csv
+    └── snapshot.json
+```
+
+Change the parent with `-o` (default `./corvid-ad-output`). `analyze` and
+`report` write straight into the `-o` you give them — no run folder, because
+you point them at an existing run.
 
 ### Find attack paths to Domain Admin
 
@@ -112,7 +129,7 @@ corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --mode
 corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user --start svc_sql
 
 # Offline, from a prior snapshot
-corvid-ad analyze -i reports/snapshot.json --start Eric.Wallows
+corvid-ad analyze -i corvid-ad-output/corvid-ad-20261019-1/snapshot.json --start jdoe
 ```
 
 `--start` accepts a `sAMAccountName`, DN or SID. Example output:
@@ -136,7 +153,7 @@ dumps SAM hashes + printable LSA secrets from those hosts, then folds
 ```bash
 # Requires impacket (pip install corvid-ad[active])
 corvid-ad scan --domain corp.local --dc-ip 10.0.0.2 --username audit.user \
-    --mode full --active --hosts 10.0.0.10,10.0.0.11 -o reports/
+    --mode full --active --hosts 10.0.0.10,10.0.0.11
 ```
 
 What it does per host:

@@ -227,11 +227,14 @@ def write_text_report(path, records, started, duration):
     path.write_text('\n'.join(content), encoding='utf-8')
 
 
+RUN_PREFIX = 'corvid-sweep'
+
+
 def create_run_folder(output, date=None):
-    """Create recon-YYYYMMDD-N, incrementing safely if a run already exists."""
+    """Create corvid-sweep-YYYYMMDD-N, incrementing safely if a run exists."""
     output.mkdir(parents=True, exist_ok=True)
     date = date or dt.datetime.now().strftime('%Y%m%d')
-    pattern = re.compile(rf'^recon-{re.escape(date)}-(\d+)$')
+    pattern = re.compile(rf'^{RUN_PREFIX}-{re.escape(date)}-(\d+)$')
     highest = 0
     for entry in output.iterdir():
         match = pattern.fullmatch(entry.name)
@@ -239,7 +242,7 @@ def create_run_folder(output, date=None):
             highest = max(highest, int(match.group(1)))
     iteration = highest + 1
     while True:
-        folder = output / f'recon-{date}-{iteration}'
+        folder = output / f'{RUN_PREFIX}-{date}-{iteration}'
         try:
             folder.mkdir()
             return folder
@@ -451,7 +454,7 @@ def main():
                         version=f'corvid-sweep {__version__}')
     parser.add_argument('-i', '--targets', type=Path, default=Path('targets.txt'))
     parser.add_argument('-o', '--output', type=Path,
-                        default=Path('output'))
+                        default=Path('corvid-sweep-output'))
     parser.add_argument('--timing', choices=['3', '4'], default='4')
     parser.add_argument('--connect', action='store_true', help='TCP connect scan instead of privileged SYN scan')
     parser.add_argument('--resume', type=Path, help='Reuse completed scans in an existing run directory')
